@@ -9,12 +9,14 @@
 A prompt chain is a technique where multiple prompts execute in sequence, each building on the outputs of previous steps.
 
 **Use Cases:**
-- Documentation generation from codebase
-- Multi-phase analysis workflows
-- Code transformation pipelines
-- Automated report generation
+
+-   Documentation generation from codebase
+-   Multi-phase analysis workflows
+-   Code transformation pipelines
+-   Automated report generation
 
 **Architecture:**
+
 ```
 Magic Prompt (Orchestrator)
     ├── 1-step.md → output-1
@@ -27,29 +29,32 @@ Magic Prompt (Orchestrator)
 
 ## 2. TWO FILE TYPES
 
-| Type | Purpose | Example |
-|------|---------|---------|
+| Type             | Purpose                                   | Example           |
+| ---------------- | ----------------------------------------- | ----------------- |
 | **Magic Prompt** | Orchestrator - sets params, defines order | `magic-prompt.md` |
-| **Sub-Prompt** | Single step - does one task | `1-analyze.md` |
+| **Sub-Prompt**   | Single step - does one task               | `1-analyze.md`    |
 
 ---
 
 ## 3. VARIABLE SYNTAX
 
 **Declaration (in magic prompt):**
+
 ```
 {output_folder} = .results
 {final_output_file} = ./output/final.md
 ```
 
 **Usage (in sub-prompts):**
+
 ```
 Write your findings to ./{output_folder}/1-analysis.md
 ```
 
 **Variable naming:**
-- Use `snake_case` with curly braces: `{variable_name}`
-- Common variables: `{output_folder}`, `{final_output_file}`, `{domain}`
+
+-   Use `snake_case` with curly braces: `{variable_name}`
+-   Common variables: `{output_folder}`, `{final_output_file}`, `{domain}`
 
 ---
 
@@ -72,19 +77,20 @@ You are executing a multi-step prompt chain.
     - Mirror the step filename: `1-first-step.md` → `{output_folder}/1-first-step.md`
 
 Stop ONLY when:
-- All steps are complete
-- A full `{final_output_file}` can be generated
+
+-   All steps are complete
+-   A full `{final_output_file}` can be generated
 ```
 
 ### Magic Prompt Components
 
-| Component | Purpose | Required |
-|-----------|---------|----------|
-| Parameters | Define variables | Yes |
-| Preview phase | "Review WITHOUT executing" | Recommended |
-| Execution order | Numbered list | Yes |
-| Output mapping | Step → output file | Yes |
-| Stop condition | When to end | Yes |
+| Component       | Purpose                    | Required    |
+| --------------- | -------------------------- | ----------- |
+| Parameters      | Define variables           | Yes         |
+| Preview phase   | "Review WITHOUT executing" | Recommended |
+| Execution order | Numbered list              | Yes         |
+| Output mapping  | Step → output file         | Yes         |
+| Stop condition  | When to end                | Yes         |
 
 ---
 
@@ -110,14 +116,14 @@ After writing ./{output_folder}/N-this-step.md, read the contents of ./N+1-next-
 
 ### Sub-Prompt Components
 
-| Component | Purpose | Required |
-|-----------|---------|----------|
-| Role | "You are a senior developer..." | Yes |
-| Input refs | Previous step outputs | Yes (except step 1) |
-| Task steps | What to do | Yes |
-| Quality guardrails | "Do not skip..." | Recommended |
-| Output file | Where to write | Yes |
-| Chain command | Link to next step | Yes (except last) |
+| Component          | Purpose                         | Required            |
+| ------------------ | ------------------------------- | ------------------- |
+| Role               | "You are a senior developer..." | Yes                 |
+| Input refs         | Previous step outputs           | Yes (except step 1) |
+| Task steps         | What to do                      | Yes                 |
+| Quality guardrails | "Do not skip..."                | Recommended         |
+| Output file        | Where to write                  | Yes                 |
+| Chain command      | Link to next step               | Yes (except last)   |
 
 ---
 
@@ -133,17 +139,18 @@ After writing ./{output_folder}/2-categorize.md, read the contents of ./3-analyz
 
 ```markdown
 You've been informed that:
-- Tech stack: ./{output_folder}/1-techstack.md (read this first)
-- File categories: ./{output_folder}/2-categorization.json
+
+-   Tech stack: ./{output_folder}/1-techstack.md (read this first)
+-   File categories: ./{output_folder}/2-categorization.json
 ```
 
 ### Chain Command Patterns
 
-| Pattern | Syntax |
-|---------|--------|
-| Next step | `read ./N-next.md and proceed accordingly` |
+| Pattern       | Syntax                                              |
+| ------------- | --------------------------------------------------- |
+| Next step     | `read ./N-next.md and proceed accordingly`          |
 | With variable | `proceed with {output_folder} as the output-folder` |
-| Read previous | `defined as: ./{output_folder}/N-previous.md` |
+| Read previous | `defined as: ./{output_folder}/N-previous.md`       |
 
 ---
 
@@ -158,9 +165,10 @@ Do not skip files or produce partial results due to time or complexity.
 Accuracy and completeness are mission-critical.
 
 You are permitted to take as long as necessary to:
-- Review every relevant file
-- Extract actual patterns and conventions
-- Produce complete, high-fidelity output
+
+-   Review every relevant file
+-   Extract actual patterns and conventions
+-   Produce complete, high-fidelity output
 
 Do not optimize for speed or brevity.
 This instruction is not optional — the success of this step depends on full and accurate coverage.
@@ -190,16 +198,17 @@ prompts/                    # Prompt files
 
 ### File Naming
 
-| Step Output | Pattern |
-|-------------|---------|
-| Markdown | `./{output_folder}/N-stepname.md` |
-| JSON | `./{output_folder}/N-stepname.json` |
+| Step Output  | Pattern                                  |
+| ------------ | ---------------------------------------- |
+| Markdown     | `./{output_folder}/N-stepname.md`        |
+| JSON         | `./{output_folder}/N-stepname.json`      |
 | Subdirectory | `./{output_folder}/N-stepname/{item}.md` |
-| Final | `{final_output_file}` |
+| Final        | `{final_output_file}`                    |
 
 ### Mirror Naming
 
 Sub-prompt filename → Output filename:
+
 ```
 1-determine-techstack.md → {output_folder}/1-techstack.md
 2-categorize-files.md → {output_folder}/2-file-categorization.json
@@ -210,6 +219,7 @@ Sub-prompt filename → Output filename:
 ## 9. EXAMPLE CHAIN
 
 ### magic-prompt.md
+
 ```markdown
 {output_folder} = .analysis
 {final_output_file} = ./CODEBASE_DOCS.md
@@ -227,10 +237,12 @@ Stop when {final_output_file} is complete.
 ```
 
 ### 1-analyze-structure.md
+
 ```markdown
 You are a senior developer analyzing codebase structure.
 
 Your task:
+
 1. Identify all directories and their purposes
 2. List key files in each directory
 3. Output to ./{output_folder}/1-structure.md
@@ -239,12 +251,14 @@ After writing, read ./2-document-components.md and proceed with {output_folder}.
 ```
 
 ### 2-document-components.md
+
 ```markdown
 You are documenting components.
 
 Structure is defined in: ./{output_folder}/1-structure.md (read first)
 
 Your task:
+
 1. For each component directory found
 2. Document purpose, props, usage
 3. Output to ./{output_folder}/2-components.md
@@ -255,14 +269,17 @@ After writing, read ./3-generate-docs.md and proceed with {output_folder}.
 ```
 
 ### 3-generate-docs.md
+
 ```markdown
 You are generating final documentation.
 
 Inputs:
-- ./{output_folder}/1-structure.md
-- ./{output_folder}/2-components.md
+
+-   ./{output_folder}/1-structure.md
+-   ./{output_folder}/2-components.md
 
 Your task:
+
 1. Synthesize all previous outputs
 2. Generate comprehensive documentation
 3. Write to {final_output_file}
@@ -275,6 +292,7 @@ This is the final step. Ensure completeness.
 ## 10. QUICK REFERENCE
 
 ### Variable Syntax
+
 ```
 {variable_name}           # Declaration and usage
 ./{output_folder}/        # Path with variable
@@ -282,18 +300,23 @@ This is the final step. Ensure completeness.
 ```
 
 ### Chain Commands
+
 ```markdown
 # Link to next
+
 After writing ..., read ./N-next.md and proceed accordingly with {output_folder}
 
 # Reference previous
+
 defined as: ./{output_folder}/N-previous.md (read this first)
 
 # Quality guardrail
+
 Do not skip files. Accuracy is mission-critical.
 ```
 
 ### File Patterns
+
 ```
 prompts/
     magic-prompt.md       # Orchestrator
@@ -310,16 +333,22 @@ prompts/
 ### Checklist
 
 **Magic Prompt:**
-- [ ] Parameters defined at top
-- [ ] Preview phase included
-- [ ] Execution order numbered
-- [ ] Output mapping specified
-- [ ] Stop condition defined
+
+-   [ ] Parameters defined at top
+-   [ ] Preview phase included
+-   [ ] Execution order numbered
+-   [ ] Output mapping specified
+-   [ ] Stop condition defined
 
 **Sub-Prompt:**
-- [ ] Role assigned
-- [ ] Previous outputs referenced (if not step 1)
-- [ ] Task steps clear
-- [ ] Output file specified
-- [ ] Chain command to next (if not last step)
-- [ ] Quality guardrails included
+
+-   [ ] Role assigned
+-   [ ] Previous outputs referenced (if not step 1)
+-   [ ] Task steps clear
+-   [ ] Output file specified
+-   [ ] Chain command to next (if not last step)
+-   [ ] Quality guardrails included
+
+---
+
+Made with ❤️ at [endorphinai.dev](https://endorphinai.dev/)

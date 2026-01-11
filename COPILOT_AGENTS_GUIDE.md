@@ -306,13 +306,11 @@ Call `manage_todo_list` with:
 	]
 }
 ```
-````
 
 **During Execution:**
 
 -   Mark task as `"in-progress"` when starting
 -   Mark task as `"completed"` after finishing
-
 ````
 
 ---
@@ -329,13 +327,15 @@ Variables flow through phases using a consistent pattern:
 **Input:** User provides `{inputId}`
 
 **Steps:**
+
 1. Fetch data from API
 2. Extract fields into variables
 
 **Output Variables:**
-- `inputId` = "12345"
-- `inputName` = "Example name"
-- `inputType` = "type_a"
+
+-   `inputId` = "12345"
+-   `inputName` = "Example name"
+-   `inputType` = "type_a"
 
 ---
 
@@ -346,12 +346,14 @@ Variables flow through phases using a consistent pattern:
 **Apply tree:** `.copilot_utils/context/trees/tree_1.md`
 
 **Steps:**
+
 1. Evaluate `inputType` against tree criteria
 2. Set `outputPath` based on match
 
 **Output Variables:**
-- `outputPath` = "path/to/output"
-- `configFile` = ".copilot_utils/context/knowledge/knowledge_1.md"
+
+-   `outputPath` = "path/to/output"
+-   `configFile` = ".copilot_utils/context/knowledge/knowledge_1.md"
 
 ---
 
@@ -360,12 +362,14 @@ Variables flow through phases using a consistent pattern:
 **Input:** Uses `outputPath`, `inputId`, `inputName` from previous phases
 
 **Steps:**
+
 1. Construct file path: `${outputPath}/${inputId}.py`
 2. Use `inputName` for description
 
 **Output:**
-- Created file at computed path
-````
+
+-   Created file at computed path
+```
 
 ### Sub-Agent Input/Output Chaining
 
@@ -470,6 +474,7 @@ Sub-Agent → (structured result) → Orchestrator
 ```
 
 **Key Concept:** Orchestrator doesn't do the work itself. It:
+
 1. Gathers context and determines what needs to be done
 2. Delegates specific tasks to sub-agents with clear inputs
 3. Collects structured results from sub-agents
@@ -506,12 +511,14 @@ handoffs:
 **Delegate to:** `validator`
 
 **Input:**
-- File: `${filePath}`
-- Rules: `.copilot_utils/context/knowledge/knowledge_1.md`
+
+-   File: `${filePath}`
+-   Rules: `.copilot_utils/context/knowledge/knowledge_1.md`
 
 **Expected return:**
-- status: PASS | FAIL
-- violations: list with line numbers
+
+-   status: PASS | FAIL
+-   violations: list with line numbers
 
 **On PASS:** Continue to Phase 3
 **On FAIL:** Stop and report violations
@@ -526,8 +533,8 @@ Use `runSubagent()` for inline sub-agent calls:
 ```javascript
 // Delegate to analyzer sub-agent
 const analysisResult = await runSubagent({
-    description: 'Analyze file for patterns',
-    prompt: `You are the Analyzer.
+	description: 'Analyze file for patterns',
+	prompt: `You are the Analyzer.
 
 **Input:**
 - File: ${filePath}
@@ -543,13 +550,13 @@ const analysisResult = await runSubagent({
     "patterns": ["pattern1", "pattern2"],
     "lineNumbers": [10, 25, 42],
     "suggestions": ["fix1", "fix2"]
-}`
+}`,
 });
 
 // Delegate to transformer sub-agent (uses result from analyzer)
 const transformResult = await runSubagent({
-    description: 'Apply transformations',
-    prompt: `You are the Transformer.
+	description: 'Apply transformations',
+	prompt: `You are the Transformer.
 
 **Input from Analyzer:**
 - Patterns: ${analysisResult.patterns}
@@ -564,7 +571,7 @@ const transformResult = await runSubagent({
     "status": "success",
     "filesModified": ["path/to/file.py"],
     "changesApplied": 3
-}`
+}`,
 });
 ```
 
@@ -583,8 +590,9 @@ const transformResult = await runSubagent({
 
 Define what each sub-agent must return:
 
-```markdown
+````markdown
 **Expected return:**
+
 ```json
 {
     "status": "PASS | FAIL",
@@ -592,7 +600,9 @@ Define what each sub-agent must return:
     "errors": []
 }
 ```
-```
+````
+
+````
 
 ### Error Handling in Orchestration
 
@@ -606,7 +616,7 @@ Define what each sub-agent must return:
 1. Log the error from sub-agent response
 2. Attempt recovery or stop workflow
 3. Report final status to user
-```
+````
 
 ---
 
@@ -1065,7 +1075,7 @@ Status + summary of sub-agent results
 
 ### Orchestrator Agent (GitHub Copilot with runSubagent)
 
-```yaml
+````yaml
 ---
 name: Copilot Orchestrator
 description: 'Orchestrates workflow using runSubagent'
@@ -1089,14 +1099,17 @@ const result = await runSubagent({
 Reference: .copilot-utils/context/knowledge/knowledge_1.md
 Return JSON: { status, violations }`
 });
-```
+````
 
 ### PHASE 3: Delegate Transformation
+
 Pass result.violations to next sub-agent.
 
 ## Return Format
+
 Status + summary
-```
+
+````
 
 ### Reviewer Agent
 
@@ -1125,7 +1138,7 @@ You review files against best practices.
 **Location:** Line X
 **Issue:** Description
 **Fix:** Recommendation
-```
+````
 
 ---
 
@@ -1281,3 +1294,7 @@ You orchestrate by delegating to specialized sub-agents.
 -   [ ] No empty sections
 -   [ ] Instructions are actionable (imperative mood)
 -   [ ] Tested with representative inputs
+
+---
+
+Made with ❤️ at [endorphinai.dev](https://endorphinai.dev/)
