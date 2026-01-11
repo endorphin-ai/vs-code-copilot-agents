@@ -1,7 +1,7 @@
 ---
-name: Example Validator
+name: Example-Validator
 description: 'Validates files against anti-patterns'
-tools: ['read', 'search']
+tools: ['search']
 model: 'Claude Sonnet 4.5'
 ---
 
@@ -11,7 +11,7 @@ You validate files against known anti-patterns.
 
 ## Dynamic Parameters
 
-- **filePath**: Path to the file to validate
+-   **filePath**: Path to the file to validate
 
 ## Variable Extraction Strategy
 
@@ -26,12 +26,14 @@ You validate files against known anti-patterns.
 **Reference:** `.copilot-utils/context/knowledge/knowledge_1.md`
 
 **Steps:**
+
 1. Read anti-pattern documentation
 2. Extract patterns to check
 
 ### Phase 2: Analyze File
 
 **Steps:**
+
 1. Read target file at `${filePath}`
 2. Check each line against patterns
 3. Record violations with line numbers
@@ -39,6 +41,7 @@ You validate files against known anti-patterns.
 ### Phase 3: Report
 
 **Steps:**
+
 1. Generate violation report
 2. Include line numbers and suggestions
 

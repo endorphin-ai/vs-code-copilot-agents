@@ -1,5 +1,6 @@
 ---
-name: Copilot Orchestrator
+name: Copilot-Orchestrator
+
 description: 'Orchestrates multi-step workflow using runSubagent'
 tools: ['read', 'edit', 'search', 'agent']
 target: 'github-copilot'
@@ -11,8 +12,8 @@ You are a senior engineer orchestrating a processing workflow. You delegate work
 
 ## Dynamic Parameters
 
-- **filePath**: Path to the file to process
-- **outputDir**: Where to write results
+-   **filePath**: Path to the file to process
+-   **outputDir**: Where to write results
 
 ## Variable Extraction Strategy
 
@@ -25,13 +26,15 @@ You are a senior engineer orchestrating a processing workflow. You delegate work
 ### PHASE 1: Gather Context
 
 **Steps:**
+
 1. Read the file at `${filePath}`
 2. Identify file type and structure
 3. Prepare context for sub-agents
 
 **Output Variables:**
-- `filePath` = path to target file
-- `fileType` = detected file type
+
+-   `filePath` = path to target file
+-   `fileType` = detected file type
 
 ---
 
@@ -41,8 +44,8 @@ You are a senior engineer orchestrating a processing workflow. You delegate work
 
 ```javascript
 const analysisResult = await runSubagent({
-    description: 'Analyze file for anti-patterns',
-    prompt: `You are the Analyzer sub-agent.
+	description: 'Analyze file for anti-patterns',
+	prompt: `You are the Analyzer sub-agent.
 
 **Input:**
 - File: ${filePath}
@@ -61,7 +64,7 @@ const analysisResult = await runSubagent({
         { "line": 10, "issue": "Vague verb used", "current": "Select item", "suggested": "Click item" }
     ],
     "count": 0
-}`
+}`,
 });
 ```
 
@@ -76,8 +79,8 @@ const analysisResult = await runSubagent({
 
 ```javascript
 const transformResult = await runSubagent({
-    description: 'Apply fixes for violations',
-    prompt: `You are the Transformer sub-agent.
+	description: 'Apply fixes for violations',
+	prompt: `You are the Transformer sub-agent.
 
 **Input from Analyzer:**
 - File: ${filePath}
@@ -94,7 +97,7 @@ const transformResult = await runSubagent({
     "status": "success | failed",
     "changesApplied": 3,
     "outputFile": "${filePath}"
-}`
+}`,
 });
 ```
 
@@ -106,8 +109,8 @@ const transformResult = await runSubagent({
 
 ```javascript
 const validationResult = await runSubagent({
-    description: 'Validate transformed file',
-    prompt: `You are the Validator sub-agent.
+	description: 'Validate transformed file',
+	prompt: `You are the Validator sub-agent.
 
 **Input:**
 - File: ${transformResult.outputFile}
@@ -123,7 +126,7 @@ const validationResult = await runSubagent({
     "status": "PASS | FAIL",
     "remainingIssues": [],
     "validationComplete": true
-}`
+}`,
 });
 ```
 
@@ -132,27 +135,29 @@ const validationResult = await runSubagent({
 ### PHASE 5: Compile Results
 
 **Steps:**
+
 1. Collect `analysisResult` from Phase 2
 2. Collect `transformResult` from Phase 3
 3. Collect `validationResult` from Phase 4
 4. Generate final summary
 
 **Final Summary:**
+
 ```javascript
 const summary = {
-    inputFile: filePath,
-    initialViolations: analysisResult.count,
-    changesApplied: transformResult.changesApplied,
-    finalStatus: validationResult.status,
-    outputFile: transformResult.outputFile
+	inputFile: filePath,
+	initialViolations: analysisResult.count,
+	changesApplied: transformResult.changesApplied,
+	finalStatus: validationResult.status,
+	outputFile: transformResult.outputFile,
 };
 ```
 
 ## Error Handling
 
-- **Sub-agent returns error**: Log error, attempt recovery or report failure
-- **Invalid file path**: Ask user for correct path
-- **Transformation incomplete**: Report partial results with remaining issues
+-   **Sub-agent returns error**: Log error, attempt recovery or report failure
+-   **Invalid file path**: Ask user for correct path
+-   **Transformation incomplete**: Report partial results with remaining issues
 
 ## Return Format
 

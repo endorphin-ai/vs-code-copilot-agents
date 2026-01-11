@@ -118,11 +118,13 @@ trees/
 
 ## 3. FRONTMATTER SYNTAX
 
+![Custom Agents](images/custom-agents.png)
+
 ### Required Properties
 
 ```yaml
 ---
-name: My Agent Name
+name: My-Agent-Name
 description: 'Brief description of agent purpose (50-150 chars)'
 tools: ['read', 'edit', 'search']
 model: 'Claude Sonnet 4.5'
@@ -131,15 +133,16 @@ model: 'Claude Sonnet 4.5'
 
 ### Full Properties Reference
 
-| Property        | Required    | Values                            | Notes                  |
-| --------------- | ----------- | --------------------------------- | ---------------------- |
-| `name`          | Optional    | String                            | Defaults to filename   |
-| `description`   | **Yes**     | `'single-quoted string'`          | 50-150 chars           |
-| `tools`         | Optional    | `['tool1', 'tool2']`              | Omit = all tools       |
-| `model`         | Recommended | `'Claude Sonnet 4.5'`, `'gpt-4o'` |                        |
-| `target`        | Optional    | `'vscode'` or `'github-copilot'`  |                        |
-| `infer`         | Optional    | `true` / `false`                  | Auto-invoke by context |
-| `argument-hint` | Optional    | String                            | Input hint for user    |
+| Property        | Required    | Values                            | Notes                              |
+| --------------- | ----------- | --------------------------------- | ---------------------------------- |
+| `name`          | Optional    | String                            | Defaults to filename               |
+| `description`   | **Yes**     | `'single-quoted string'`          | 50-150 chars                       |
+| `tools`         | Optional    | `['tool1', 'tool2']`              | Omit = all tools                   |
+| `model`         | Recommended | `'Claude Sonnet 4.5'`, `'gpt-4o'` |                                    |
+| `target`        | Optional    | `'vscode'` or `'github-copilot'`  |                                    |
+| `infer`         | Optional    | `true` / `false`                  | Auto-invoke by context             |
+| `argument-hint` | Optional    | String                            | Input hint for user (VS Code only) |
+| `handoffs`      | Optional    | List of agent delegations         | Sub-agents to delegate to (VS Code only) |
 
 ---
 
@@ -180,7 +183,7 @@ tools: ['my-mcp/tool-name']           # Custom MCP server
 
 ```yaml
 ---
-name: VS Code Only Agent
+name: VS-Code-Only-Agent
 target: 'vscode'
 tools: ['read', 'edit', 'todo'] # todo only works in VS Code
 ---
@@ -188,7 +191,7 @@ tools: ['read', 'edit', 'todo'] # todo only works in VS Code
 
 ```yaml
 ---
-name: GitHub.com Agent
+name: GitHub-Agent
 target: 'github-copilot'
 tools: ['read', 'edit', 'github/*']
 ---
@@ -290,6 +293,8 @@ You are a [specialist type] focused on [domain].
 ```
 
 ### Progress Tracking (VS Code)
+
+![Todo List](images/todo.png)
 
 ````markdown
 ## PROGRESS TRACKING
@@ -488,27 +493,38 @@ Use `handoffs` in frontmatter to define sub-agents:
 
 ```yaml
 ---
-name: VS Code Orchestrator
+name: VS-Code-Orchestrator
 description: 'Orchestrates validation workflow'
 tools: ['read', 'edit', 'search', 'agent', 'todo']
 model: 'Claude Sonnet 4.5'
 target: 'vscode'
 handoffs:
-    - name: validator
-      agent: .github/agents/validator.agent.md
-    - name: transformer
-      agent: .github/agents/transformer.agent.md
-    - name: reporter
-      agent: .github/agents/reporter.agent.md
+    - label: 'Validate File'
+      agent: 'Validator-Agent'
+      prompt: 'Analyze this file for anti-patterns and return violations'
+    - label: 'Transform File'
+      agent: 'Transformer-Agent'
+      prompt: 'Apply fixes for the violations found'
+    - label: 'Generate Report'
+      agent: 'Reporter-Agent'
+      prompt: 'Create summary report of all changes'
 ---
 ```
+
+**Handoffs Properties:**
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| `label` | Yes | Button label shown to user |
+| `agent` | Yes | Agent name to delegate to |
+| `prompt` | Yes | Instructions passed to sub-agent |
 
 **Delegation in workflow:**
 
 ```markdown
 ### PHASE 2: Validate
 
-**Delegate to:** `validator`
+**Delegate to:** `Validator-Agent` via handoff
 
 **Input:**
 
@@ -948,7 +964,7 @@ Don't put "bad examples" with full code. Instead, list patterns to identify:
 
 ```yaml
 ---
-name: Code Validator
+name: Code-Validator
 description: 'Validates code against defined patterns and anti-patterns'
 tools: ['read', 'search']
 model: 'Claude Sonnet 4.5'
@@ -980,7 +996,7 @@ Generate violation report
 
 ```yaml
 ---
-name: Anti-Pattern Checker
+name: Anti-Pattern-Checker
 description: 'Validates code against anti-patterns that cause failures'
 tools: ['read', 'search']
 model: 'Claude Sonnet 4.5'
@@ -1039,16 +1055,18 @@ For each violation found:
 
 ```yaml
 ---
-name: VS Code Orchestrator
+name: VS-Code-Orchestrator
 description: 'Orchestrates workflow with sub-agent delegation'
 tools: ['read', 'edit', 'search', 'agent', 'todo']
 model: 'Claude Sonnet 4.5'
 target: 'vscode'
 handoffs:
-    - name: analyzer
-      agent: .github/agents/analyzer.agent.md
-    - name: transformer
-      agent: .github/agents/transformer.agent.md
+    - label: 'Analyze File'
+      agent: 'Analyzer-Agent'
+      prompt: 'Analyze this file and return findings'
+    - label: 'Transform File'
+      agent: 'Transformer-Agent'
+      prompt: 'Apply transformations based on analysis'
 ---
 
 ## Role
@@ -1060,12 +1078,12 @@ You orchestrate by delegating to sub-agents.
 Read file, prepare context for sub-agents.
 
 ### PHASE 2: Delegate Analysis
-**Delegate to:** `analyzer`
+**Delegate to:** `Analyzer-Agent` via handoff
 **Input:** File path + reference
 **Expected return:** { status, violations }
 
 ### PHASE 3: Delegate Transformation
-**Delegate to:** `transformer`
+**Delegate to:** `Transformer-Agent` via handoff
 **Input:** File path + violations from Phase 2
 **Expected return:** { status, changesApplied }
 
@@ -1077,7 +1095,7 @@ Status + summary of sub-agent results
 
 ````yaml
 ---
-name: Copilot Orchestrator
+name: Copilot-Orchestrator
 description: 'Orchestrates workflow using runSubagent'
 tools: ['read', 'edit', 'search', 'agent']
 target: 'github-copilot'
@@ -1115,7 +1133,7 @@ Status + summary
 
 ```yaml
 ---
-name: Architecture Reviewer
+name: Architecture-Reviewer
 description: 'Reviews files against best practices'
 tools: ['read', 'search']
 model: 'Claude Sonnet 4.5'
@@ -1167,17 +1185,19 @@ You are a [role] specialist.
 
 ```yaml
 ---
-name: Full Orchestrator
+name: Full-Orchestrator
 description: 'Complete orchestration with sub-agent delegation'
 tools: ['read', 'edit', 'search', 'agent', 'todo']
 model: 'Claude Sonnet 4.5'
 target: 'vscode'
 argument-hint: 'Provide the input parameter'
 handoffs:
-    - name: analyzer
-      agent: .github/agents/analyzer.agent.md
-    - name: transformer
-      agent: .github/agents/transformer.agent.md
+    - label: 'Analyze File'
+      agent: 'Analyzer-Agent'
+      prompt: 'Analyze this file for patterns and issues'
+    - label: 'Transform File'
+      agent: 'Transformer-Agent'
+      prompt: 'Apply fixes based on analysis results'
 ---
 
 ## Role
@@ -1203,7 +1223,7 @@ You orchestrate by delegating to specialized sub-agents.
 ### PHASE 2: Delegate Analysis
 **Before starting:** Mark todo #2 as "in-progress"
 
-**Delegate to:** `analyzer`
+**Delegate to:** `Analyzer-Agent` via handoff
 
 **Input:**
 - File: `${filePath}`
@@ -1217,7 +1237,7 @@ You orchestrate by delegating to specialized sub-agents.
 ### PHASE 3: Delegate Transformation
 **Before starting:** Mark todo #3 as "in-progress"
 
-**Delegate to:** `transformer`
+**Delegate to:** `Transformer-Agent` via handoff
 
 **Input:**
 - File: `${filePath}`

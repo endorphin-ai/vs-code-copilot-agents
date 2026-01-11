@@ -1,7 +1,7 @@
 ---
-name: Example Orchestrator
+name: Example-Orchestrator
 description: 'Simple orchestrator pattern example'
-tools: ['read', 'edit', 'search', 'agent']
+tools: ['edit', 'search', 'todos']
 model: 'Claude Sonnet 4.5'
 ---
 
@@ -18,13 +18,14 @@ Sub-Agent → (structured result) → Orchestrator
 
 ## Dynamic Parameters
 
-- **filePath**: Path to process
+-   **filePath**: Path to process
 
 ## Workflow
 
 ### PHASE 1: Gather Context
 
 **Steps:**
+
 1. Read file at `${filePath}`
 2. Determine what processing is needed
 
@@ -36,8 +37,8 @@ Sub-Agent → (structured result) → Orchestrator
 
 ```javascript
 const result = await runSubagent({
-    description: 'Process the file',
-    prompt: `You are the Processor.
+	description: 'Process the file',
+	prompt: `You are the Processor.
 
 **Input:**
 - File: ${filePath}
@@ -50,7 +51,7 @@ const result = await runSubagent({
 {
     "status": "success",
     "output": "result data"
-}`
+}`,
 });
 ```
 
@@ -59,6 +60,7 @@ const result = await runSubagent({
 ### PHASE 3: Use Result
 
 **Steps:**
+
 1. Receive `result` from sub-agent
 2. Take action based on result
 3. Report completion
@@ -72,5 +74,5 @@ const result = await runSubagent({
 
 ## See Also
 
-- `vscode-orchestrator.agent.md` - Full VS Code example with `handoffs`
-- `copilot-orchestrator.agent.md` - Full GitHub Copilot example with `runSubagent`
+-   `vscode-orchestrator.agent.md` - Full VS Code example with `handoffs`
+-   `copilot-orchestrator.agent.md` - Full GitHub Copilot example with `runSubagent`
