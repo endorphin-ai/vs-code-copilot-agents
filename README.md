@@ -23,9 +23,10 @@ COPILOT_AGENTS_GUIDE.md          # Agent guide
 
 ## Guides
 
-| Guide                     | Purpose                                   |
-| ------------------------- | ----------------------------------------- |
-| `COPILOT_AGENTS_GUIDE.md` | Building custom agents for GitHub Copilot |
+| Guide                                                     | Purpose                                                                           |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `COPILOT_AGENTS_GUIDE.md`                                 | Building custom agents for GitHub Copilot                                         |
+| [VIDEO](https://youtu.be/NK3-4ouSxKw?si=tBcG7D88yIROvpx8) | How to Build a Custom AI Agent for GitHub Copilot (Context Engineering Explained) |
 
 ## Quick Start
 
